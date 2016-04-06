@@ -31,6 +31,7 @@ public class CustomButton extends LinearLayout implements View.OnClickListener {
     private String json = "";
     private Bitmap mBitmap;
     private float x, y;
+
     public CustomButton(Context context) {
         super(context);
         mContext = context;
@@ -99,32 +100,27 @@ public class CustomButton extends LinearLayout implements View.OnClickListener {
 
     public View getItemView(final ButtonItem buttonitem) {
         LinearLayout layout = new LinearLayout(mContext);
-            LayoutParams params1 = new LayoutParams(LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT,1.0F);
+        LayoutParams params1 = new LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT, 1.0F);
          /* 边距*/
-        params1.setMargins(DensityUtil.px2dip(mContext, 3), DensityUtil.px2dip(mContext, 3),
-                DensityUtil.px2dip(mContext, 3), DensityUtil.px2dip(mContext, 3));
+        params1.setMargins(DensityUtil.px2dip(mContext, 3), DensityUtil.px2dip(mContext, 5),
+                DensityUtil.px2dip(mContext, 3), DensityUtil.px2dip(mContext, 5));
         layout.setOrientation(LinearLayout.HORIZONTAL);
         layout.setGravity(Gravity.CENTER);
         layout.setLayoutParams(params1);
 
         Button button = new Button(mContext);
         button.setText(buttonitem.getButtonName());
-//        button.setTextSize(buttonitem.getButtonSize());
         button.setTextColor(buttonitem.getButtonColor());
         button.setId(buttonitem.getId());
         button.setTag(buttonitem);
         button.setOnClickListener(this);
         button.setGravity(Gravity.CENTER);
-
-//        button.setWidth(buttonitem.getButtonWidth());
-//        button.setHeight(buttonitem.getButtonHeight());
         if (buttonitem.getIsCheck()) {
             button.setText(buttonitem.getButtonName());
         } else {
             button.setText(buttonitem.getCheckName());
         }
-
         button.setBackground(null);
         button.setBackground(getResources().getDrawable(R.drawable.selector));
         layout.addView(button);
@@ -134,15 +130,12 @@ public class CustomButton extends LinearLayout implements View.OnClickListener {
 
     //监听
     private ButtonListener buttonListener;
-
     public ButtonListener getButtonListener() {
         return buttonListener;
     }
-
     public void setButtonListener(ButtonListener buttonListener) {
         this.buttonListener = buttonListener;
     }
-
     public void onClick(View v) {
         ButtonItem buttonItem = (ButtonItem) v.getTag();
         buttonItem.setIsCheck(!buttonItem.getIsCheck());
@@ -153,7 +146,6 @@ public class CustomButton extends LinearLayout implements View.OnClickListener {
             case 1:
                 /*保存*/
                 mPaintView.Save();
-//                mPaintView.createSignFile();
                 break;
             case 2:
                /* 字体大小*/
@@ -169,11 +161,11 @@ public class CustomButton extends LinearLayout implements View.OnClickListener {
                 break;
             case 5:
               /*  清空*/
-                mPaintView.Clear();
+                mPaintView.ClearPath();
                 break;
             case 6:
                 /*橡皮擦*/
-                mPaintView.eraserdo(true);
+                mPaintView.isEraser(true);
                 break;
             case 7:
                 /*恢复*/
@@ -181,7 +173,7 @@ public class CustomButton extends LinearLayout implements View.OnClickListener {
                 break;
             case 8:
                 /*画笔*/
-                mPaintView.eraserdo(false);
+                mPaintView.isEraser(false);
                 break;
             case 9:
                 /*上次*/

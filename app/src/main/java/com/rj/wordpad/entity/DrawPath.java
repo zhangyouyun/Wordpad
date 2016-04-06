@@ -8,8 +8,8 @@ import android.graphics.Path;
  */
 public class DrawPath {
     //画笔和路径
-   public  Path path;
-   public  Paint paint;
+    public Path path;
+    public Paint paint;
 
     @Override
     public String toString() {
