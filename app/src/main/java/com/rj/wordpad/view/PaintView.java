@@ -41,6 +41,8 @@ import java.util.List;
  * Created by zhangyouyun  on 2016/3/21.
  */
 public class PaintView extends View {
+    private float mLastTouchX;
+    private float mLastTouchY;
     //View state 视图状态
     private List<TimedPoint> mPoints;
     private float mLastVelocity;
@@ -90,9 +92,8 @@ public class PaintView extends View {
     private List<List<PointF>> lastPoints = new ArrayList<>();
     private float xmax = 0, xmin = 0, ymax = 0, ymin = 0;
     Bitmap Erase;
-    Bitmap mSignatureBitmap = null;
+//    Bitmap mSignatureBitmap = null;
     private RectF mDirtyRect;
-    Canvas mSignatureBitmapCanvas = null;
     public PaintView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.mContext = context;
@@ -126,7 +127,7 @@ public class PaintView extends View {
         mLastVelocity = 0;
         mLastWidth = (mMinWidth + mMaxWidth) / 2;
         mPath.reset();
-        mSignatureBitmap = null;
+        mBitmap = null;
         setIsEmpty(true);
 
         invalidate();
@@ -243,16 +244,16 @@ public class PaintView extends View {
 
             // Set the incremental stroke width and draw.
             mPaint.setStrokeWidth(startWidth + ttt * widthDelta);
-            mSignatureBitmapCanvas.drawPoint(x, y, mPaint);
+            mCanvas.drawPoint(x, y, mPaint);
             expandDirtyRect(x, y);
         }
         mPaint.setStrokeWidth(originalWidth);
     }
     private void ensureSignatureBitmap() {
-        if (mSignatureBitmap == null) {
-            mSignatureBitmap = Bitmap.createBitmap(getWidth(), getHeight(),
+        if (mBitmap == null) {
+            mBitmap = Bitmap.createBitmap(getWidth(), getHeight(),
                     Bitmap.Config.ARGB_8888);
-            mSignatureBitmapCanvas = new Canvas(mSignatureBitmap);
+            mCanvas = new Canvas(mBitmap);
         }
     }
     //--------------------------
@@ -273,20 +274,21 @@ public class PaintView extends View {
 //        mPaint.setFakeBoldText(true); //true为粗体，false为非粗体
         /*变淡的效果*/
         mPaint.setAlpha(0x80);
-
+//        addPoint(new TimedPoint(x, y));
         mMinWidth = 3f;
         mMaxWidth = 7f;
         mVelocityFilterWeight = 0.9f;
-//        // 矩形仅更新视图的改变部分
-//        mDirtyRect = new RectF();
-//        clearBezier();
         mPath = new Path();
 
     }
     /*画的方法*/
     public void onDraw(Canvas canvas) {
         canvas.drawColor(-1);
-        canvas.drawBitmap(mBitmap, 0, 0, mPaint);
+
+            if(mBitmap != null) {
+                canvas.drawBitmap(mBitmap, 0, 0, mPaint);
+            }
+
         if (mPath != null) {
             // 实时的显示
             canvas.drawPath(mPath, mPaint);
@@ -492,6 +494,10 @@ public class PaintView extends View {
         if (!eraserstate) {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
+                    mPoints.clear();//                流畅的关键
+                    setIsEmpty(false);//                关键
+                    addPoint(new TimedPoint(eventX, eventY));
+
                     mPath = new Path();
                     dp = new DrawPath();
                     dp.path = mPath;
@@ -499,23 +505,23 @@ public class PaintView extends View {
                     touch_start(x, y);
                     invalidate();
 
-                    mPoints.clear();//                流畅的关键
-                    setIsEmpty(false);//                关键
-                    addPoint(new TimedPoint(eventX, eventY));
+
                     break;
                 case MotionEvent.ACTION_MOVE:
+                    addPoint(new TimedPoint(eventX, eventY));
                     points.add(pointF);
                     touch_move(x, y);
                     invalidate();
 
-                    addPoint(new TimedPoint(eventX, eventY));
+
                     break;
                 case MotionEvent.ACTION_UP:
+                    addPoint(new TimedPoint(eventX, eventY));
                     savePoint.add(points);
                     points = new ArrayList<>();
                     touch_up();
                     invalidate();
-                    addPoint(new TimedPoint(eventX, eventY));
+
                     break;
             }
         } else {
